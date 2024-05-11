@@ -29,7 +29,7 @@ void handleInterrupt() {
   }
 }
 
-void testGPIO(int Code) {
+void sendCode(int Code) {
   Serial1.println(Code);
   while (!Serial1.available());
   int rec = Serial1.parseInt();
@@ -48,9 +48,13 @@ void setup() {
 
   // Initialize Button Press pin
   pinMode(PB10, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(PB10), handleInterrupt, FALLING);
+  attachInterrupt(digitalPinToInterrupt(PB10), handleInterrupt, FALLING);  
+}
 
+void loop() {
+  
   while (flashFlag != 2); // waits for flashing to complete
+  flashFlag = 0;
   
   Serial1.begin(BAUD_RATE); // Start UART at 9600
   delay(1000); // Giving testi a lil bit of time
@@ -78,20 +82,5 @@ void setup() {
   }
   
   delay(1000);
-  testGPIO(100);
-  testGPIO(101);
-  testGPIO(102);
-  testGPIO(103);
-  testGPIO(104);
-  testGPIO(105);
-  testGPIO(106);
-  testGPIO(107);
-  testGPIO(108);
-  testGPIO(109);
-  testGPIO(110);
-  testGPIO(111);
-  testGPIO(112);
-  
-}
-
-void loop() {};
+  sendCode(102);
+};
