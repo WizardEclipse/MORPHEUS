@@ -18,7 +18,7 @@ last_ran = datetime.min
 #Callback type beat
 def button_press(channel):
     global last_ran
-    if datetime.now() - last_ran > timedelta(minutes=1):
+    if datetime.now() - last_ran > timedelta(minutes=0.1):
         print("Ye boi, Flashing")
         
         # Notifies Paulo of Flash start 
@@ -27,7 +27,8 @@ def button_press(channel):
         GPIO.output(2, GPIO.HIGH)
         
         #Flashes
-        os.system("pio run --target clean && pio run --target upload")
+        #os.system("pio run --target clean && pio run --target upload")
+        os.system("pio run --target upload")
         last_ran = datetime.now()
         
         #Notifies Paulo of Flash end
