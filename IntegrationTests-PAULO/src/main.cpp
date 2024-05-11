@@ -29,6 +29,14 @@ void handleInterrupt() {
   }
 }
 
+void testGPIO(int Code) {
+  Serial1.println(Code);
+  while (!Serial1.available());
+  int rec = Serial1.parseInt();
+  display_handler.println(rec);
+  display_handler.display();
+}
+
 void setup() {
 
   // Sets up mini display I2C
@@ -69,6 +77,20 @@ void setup() {
     display_handler.display();
   }
   
+  delay(1000);
+  testGPIO(100);
+  testGPIO(101);
+  testGPIO(102);
+  testGPIO(103);
+  testGPIO(104);
+  testGPIO(105);
+  testGPIO(106);
+  testGPIO(107);
+  testGPIO(108);
+  testGPIO(109);
+  testGPIO(110);
+  testGPIO(111);
+  testGPIO(112);
   
 }
 
