@@ -10,9 +10,9 @@ void setup() {
   
   while (!Serial1.available());  // Wait for handshake initiation from PAULO
   int receivedMessage = Serial1.parseInt(); // Read the incoming data
-  if (receivedMessage== 101) {
+  if (receivedMessage== 001) {
 	  digitalWrite(LED_PIN, HIGH); // Turn LED on
-	  Serial1.println(102);  // Send back handshake confirmation
+	  Serial1.println(002);  // Send back handshake confirmation
 	  delay(250);
 	  digitalWrite(LED_PIN, LOW);  // Turn LED off
   }

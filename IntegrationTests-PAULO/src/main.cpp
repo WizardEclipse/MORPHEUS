@@ -47,7 +47,7 @@ void setup() {
   Serial1.begin(BAUD_RATE); // Start UART at 9600
   delay(1000); // Giving testi a lil bit of time
 
-  Serial1.println(101); // Send Handshake From Paulo to Testi
+  Serial1.println(001); // Send Handshake From Paulo to Testi
   display_handler.println("Start UART Test...");
   display_handler.display();
 
@@ -55,7 +55,7 @@ void setup() {
 
   if (Serial1.available()) {
     int recievedMessage = Serial1.parseInt(); //read incoming
-    if (recievedMessage == 102) {
+    if (recievedMessage == 002) {
       display_handler.println("Handshake recieved");
       display_handler.println("UART Success");
       display_handler.display();

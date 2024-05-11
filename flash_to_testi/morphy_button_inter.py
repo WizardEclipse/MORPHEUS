@@ -18,7 +18,7 @@ def button_press(channel):
     global last_ran
     if datetime.now() - last_ran > timedelta(minutes=1):
         print("Ye boi, Flashing")
-        os.system("pio run --target clean pio run --target upload")
+        os.system("pio run --target clean && pio run --target upload")
         last_ran = datetime.now()
     else:
         print('Chill fam')
