@@ -12,5 +12,9 @@
 - 002 - Testi to Paulo handshake failed
 - 003 - UART time out
 
-#### 1xx Error Codes:
-- 1(00 - - GPIO
+#### 1xx GPIO Error Codes:
+- 1(00 - 28) - GPIO pin test failure
+
+#### 4xx Fatal Error Codes:
+
+- 400 -  Flashing Failure
