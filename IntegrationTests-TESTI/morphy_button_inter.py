@@ -6,8 +6,10 @@ import time
 
 ## GPIO.sEtup
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(3, GPIO.IN, pull_up_down = GPIO.PUD_UP)
-GPIO.setup(2, GPIO.OUT, initial=GPIO.HIGH)
+GPIO.setup(26, GPIO.IN, pull_up_down = GPIO.PUD_UP) #Button
+
+GPIO.setup(5, GPIO.OUT, initial=GPIO.HIGH)
+GPIO.setup(6, GPIO.OUT, initial=GPIO.HIGH)
 
 
 ## Event running in background with interrupts 
@@ -22,25 +24,30 @@ def button_press(channel):
         print("Ye boi, Flashing")
         
         # Notifies Paulo of Flash start 
-        GPIO.output(2, GPIO.LOW)
+        GPIO.output(5, GPIO.LOW)
         time.sleep(1)
-        GPIO.output(2, GPIO.HIGH)
+        GPIO.output(5, GPIO.HIGH)
         
         #Flashes
         #os.system("pio run --target clean && pio run --target upload")
-        os.system("pio run --target upload")
+        errcode = os.system("pio run --target upload")
         last_ran = datetime.now()
         
         #Notifies Paulo of Flash end
-        GPIO.output(2, GPIO.LOW)
-        time.sleep(1)
-        GPIO.output(2, GPIO.HIGH)
+        if (errcode == 0): # Succesful flash
+                GPIO.output(5, GPIO.LOW)
+                time.sleep(0.1)
+                GPIO.output(5, GPIO.HIGH)
+        elif (errcode != 0): # Did not flash properly, notify different pin of fatal error
+                GPIO.output(6, GPIO.LOW)
+                time.sleep(0.1)
+                GPIO.output(6, GPIO.HIGH)
     else:
         print('Chill fam')
             
 
 #Interrupt type beat
-GPIO.add_event_detect(3, GPIO.FALLING, callback=button_press, bouncetime=300)
+GPIO.add_event_detect(26, GPIO.FALLING, callback=button_press, bouncetime=300)
 
 
 ##Go to sleep
