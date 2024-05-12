@@ -8,13 +8,11 @@
 #define BAUD_RATE 9600
 
 Adafruit_SSD1306 display_handler(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-
-volatile int flashFlag = 0;
-String ScreenText;
+volatile int flashFlag; // Flash Flag
 
 // Interrupt handler for intial button press
-void handleInterrupt() {
-  if (flashFlag != 1){
+void flashInterrupt() {
+  if (flashFlag == 0){
     display_handler.clearDisplay();
     display_handler.setCursor(0,0);
     display_handler.println("Flashing...");
@@ -29,6 +27,16 @@ void handleInterrupt() {
   }
 }
 
+void flashFAILInterrupt() {
+  flashFlag = 400;
+  display_handler.clearDisplay();
+  display_handler.setCursor(0,0);
+  display_handler.println("FLASHING ERROR");
+  display_handler.println(flashFlag);
+  display_handler.display();
+
+}
+
 void sendCode(int Code) {
   Serial1.println(Code);
   while (!Serial1.available());
@@ -38,6 +46,8 @@ void sendCode(int Code) {
 }
 
 void setup() {
+  
+  flashFlag = 0;
 
   // Sets up mini display I2C
   display_handler.begin(SSD1306_SWITCHCAPVCC, 0x3C);
@@ -45,10 +55,14 @@ void setup() {
   display_handler.setTextSize(1);
   display_handler.setTextColor(SSD1306_WHITE);
   display_handler.setCursor(0,0);
+  display_handler.println("STANDBY");
+  display_handler.display();
 
   // Initialize Button Press pin
   pinMode(PB10, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(PB10), handleInterrupt, FALLING);  
+  pinMode(PB11, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(PB10), flashInterrupt, FALLING); 
+  attachInterrupt(digitalPinToInterrupt(PB11), flashFAILInterrupt, FALLING);  
 }
 
 void loop() {
@@ -83,4 +97,5 @@ void loop() {
   
   delay(1000);
   sendCode(102);
+  sendCode(101);
 };
