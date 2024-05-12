@@ -97,5 +97,28 @@ void loop() {
   
   delay(1000);
   sendCode(102);
+
+  // B12 B13 B14 -> A B C
+  pinMode(PB12, OUTPUT);
+  digitalWrite(PB12, LOW);
+  
+  pinMode(PB13, OUTPUT);
+  digitalWrite(PB13, LOW);
+  
+  pinMode(PB14, OUTPUT);
+  digitalWrite(PB14, LOW);
+
+  pinMode(PA0, INPUT);
   sendCode(101);
+
+  display_handler.println(digitalRead(PA0));
+  display_handler.display();
+  
 };
+
+// void multiPlex(int pinIndex) {
+//   digitalWrite(PB12, (pinIndex & 1) ? HIGH : LOW);
+//   digitalWrite(PB13, (pinIndex & 1) ? HIGH : LOW);
+//   digitalWrite(PB14, (pinIndex & 1) ? HIGH : LOW);
+
+// }
