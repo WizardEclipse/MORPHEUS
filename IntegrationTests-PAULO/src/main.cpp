@@ -8,6 +8,7 @@
 #define BAUD_RATE 9600
 
 Adafruit_SSD1306 display_handler(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+void setMultiplex(int pinIndex);
 volatile int flashFlag; // Flash Flag
 
 // Interrupt handler for intial button press
@@ -58,7 +59,12 @@ void setup() {
   display_handler.println("STANDBY");
   display_handler.display();
 
-  // Initialize Button Press pin
+  //Initiate Multiplex pins
+  pinMode(PB12, OUTPUT);
+  pinMode(PB13, OUTPUT);
+  pinMode(PB14, OUTPUT);
+
+  // Initialize Flash Response pins
   pinMode(PB10, INPUT_PULLUP);
   pinMode(PB11, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(PB10), flashInterrupt, FALLING); 
@@ -96,29 +102,21 @@ void loop() {
   }
   
   delay(1000);
-  sendCode(102);
-
-  // B12 B13 B14 -> A B C
-  pinMode(PB12, OUTPUT);
-  digitalWrite(PB12, LOW);
-  
-  pinMode(PB13, OUTPUT);
-  digitalWrite(PB13, LOW);
-  
-  pinMode(PB14, OUTPUT);
-  digitalWrite(PB14, LOW);
-
   pinMode(PA0, INPUT);
-  sendCode(101);
-
-  display_handler.println(digitalRead(PA0));
-  display_handler.display();
+  display_handler.clearDisplay();
+  display_handler.setCursor(0,0);
+  for (int i = 0; i < 8; i++) {
+    setMultiplex(i);
+    sendCode(100 + i);
+    display_handler.println(digitalRead(PA0));
+    display_handler.display();
+  }
   
 };
 
-// void multiPlex(int pinIndex) {
-//   digitalWrite(PB12, (pinIndex & 1) ? HIGH : LOW);
-//   digitalWrite(PB13, (pinIndex & 1) ? HIGH : LOW);
-//   digitalWrite(PB14, (pinIndex & 1) ? HIGH : LOW);
-
-// }
+void setMultiplex(int pinIndex) {
+  // B12 B13 B14 -> A B C
+  digitalWrite(PB12, (pinIndex & 0x01));
+  digitalWrite(PB13, (pinIndex & 0x02) >> 1);
+  digitalWrite(PB14, (pinIndex & 0x04) >> 2);
+}
