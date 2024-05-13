@@ -8,12 +8,11 @@
 #define BAUD_RATE 9600
 
 Adafruit_SSD1306 display_handler(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-void setMultiplex(int pinIndex);
 volatile int flashFlag; // Flash Flag
 
 // Interrupt handler for intial button press
 void flashInterrupt() {
-  if (flashFlag == 0){
+  if (flashFlag == 0 || flashFlag == 400){
     display_handler.clearDisplay();
     display_handler.setCursor(0,0);
     display_handler.println("Flashing...");
@@ -42,10 +41,38 @@ void sendCode(int Code) {
   Serial1.println(Code);
   while (!Serial1.available());
   int rec = Serial1.parseInt();
-  display_handler.println(rec);
+  display_handler.print(rec);
+  display_handler.print(" ");
   display_handler.display();
 }
 
+
+void setMultiplex(int pinIndex) {
+  // B12 B13 B14 -> A B C
+  digitalWrite(PB12, (pinIndex & 1) ? HIGH : LOW);
+  digitalWrite(PB13, (pinIndex & 2) ? HIGH : LOW);
+  digitalWrite(PB14, (pinIndex & 4) ? HIGH : LOW);
+}
+
+int PortA0Pins[] = {PA0, PA1, PA2, PA3, PA4, PA5, PA6, PA7};
+int PortA1Pins[] = {PA8, PA11, PA12, PA15};
+
+void testGPIO(void) {
+  pinMode(PA0, INPUT);
+  pinMode(PA1, INPUT);
+  display_handler.clearDisplay();
+  display_handler.setCursor(0,0);
+  for (int i = 0; i < 8; i++) {
+    setMultiplex(i);
+    sendCode(100 + i);
+    display_handler.print(digitalRead(PA0));
+    display_handler.print(" ");
+    sendCode(100 + 8 + i);
+    display_handler.println(digitalRead(PA1));
+    display_handler.display();
+    delay(500);
+  }
+}
 void setup() {
   
   flashFlag = 0;
@@ -102,21 +129,34 @@ void loop() {
   }
   
   delay(1000);
-  pinMode(PA0, INPUT);
-  display_handler.clearDisplay();
-  display_handler.setCursor(0,0);
-  for (int i = 0; i < 8; i++) {
-    setMultiplex(i);
-    sendCode(100 + i);
-    display_handler.println(digitalRead(PA0));
-    display_handler.display();
-  }
+  
+  testGPIO();
   
 };
 
-void setMultiplex(int pinIndex) {
-  // B12 B13 B14 -> A B C
-  digitalWrite(PB12, (pinIndex & 0x01));
-  digitalWrite(PB13, (pinIndex & 0x02) >> 1);
-  digitalWrite(PB14, (pinIndex & 0x04) >> 2);
-}
+// void setMultiplex(int pinIndex) {
+//   // B12 B13 B14 -> A B C
+//   digitalWrite(PB12, (pinIndex & 1) ? HIGH : LOW);
+//   digitalWrite(PB13, (pinIndex & 2) ? HIGH : LOW);
+//   digitalWrite(PB14, (pinIndex & 4) ? HIGH : LOW);
+// }
+
+// int PortA0Pins[] = {PA0, PA1, PA2, PA3, PA4, PA5, PA6, PA7};
+// int PortA1Pins[] = {PA8, PA11, PA12, PA15};
+
+// void testGPIO(void) {
+//   pinMode(PA0, INPUT);
+//   pinMode(PA1, INPUT);
+//   display_handler.clearDisplay();
+//   display_handler.setCursor(0,0);
+//   for (int i = 0; i < 8; i++) {
+//     setMultiplex(i);
+//     sendCode(100 + i);
+//     sendCode(100 + 8 + i);
+//     display_handler.print(" ");
+//     display_handler.println(digitalRead(PA0));
+//     display_handler.println(digitalRead(PA1));
+//     display_handler.display();
+//     delay(400);
+//   }
+//}
