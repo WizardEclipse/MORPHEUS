@@ -41,7 +41,7 @@ void sendCode(int Code) {
   Serial1.println(Code);
   while (!Serial1.available());
   int rec = Serial1.parseInt();
-  display_handler.print(rec);
+  display_handler.print(rec % 100);
   display_handler.print(" ");
   display_handler.display();
 }
@@ -55,21 +55,34 @@ void setMultiplex(int pinIndex) {
 }
 
 int PortA0Pins[] = {PA0, PA1, PA2, PA3, PA4, PA5, PA6, PA7};
-int PortA1Pins[] = {PA8, PA11, PA12, PA15};
+int PortA1Pins[] = {PA8, PA11, PA12, PA15, PB0, PB1, PB3, PB4};
 
-void testGPIO(void) {
+void testGPIO4plex(void) {
   pinMode(PA0, INPUT);
   pinMode(PA1, INPUT);
+  pinMode(PA2, INPUT);
+  pinMode(PA3, INPUT);
+  
   display_handler.clearDisplay();
   display_handler.setCursor(0,0);
-  for (int i = 0; i < 8; i++) {
+  
+  for (int i = 0; i < 8; i++) { // 8 on the multiplex
     setMultiplex(i);
+    
     sendCode(100 + i);
     display_handler.print(digitalRead(PA0));
     display_handler.print(" ");
     sendCode(100 + 8 + i);
-    display_handler.println(digitalRead(PA1));
+    display_handler.print(digitalRead(PA1));
+    display_handler.print(" ");
+    sendCode(100 + 16 + i);
+    display_handler.print(digitalRead(PA2));
+    display_handler.print(" ");
+    sendCode(100 + 24 + i);
+    display_handler.print(digitalRead(PA3));
+    display_handler.println("");
     display_handler.display();
+    
     delay(500);
   }
 }
@@ -80,7 +93,7 @@ void setup() {
   // Sets up mini display I2C
   display_handler.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   display_handler.clearDisplay();
-  display_handler.setTextSize(1);
+  display_handler.setTextSize(0.5);
   display_handler.setTextColor(SSD1306_WHITE);
   display_handler.setCursor(0,0);
   display_handler.println("STANDBY");
@@ -130,7 +143,7 @@ void loop() {
   
   delay(1000);
   
-  testGPIO();
+  testGPIO4plex();
   
 };
 
