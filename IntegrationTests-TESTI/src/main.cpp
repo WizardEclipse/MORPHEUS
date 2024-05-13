@@ -5,10 +5,11 @@
 
 //~ PinName pwmPins[] = {PA_0, PA_1, PA_2, PA_3, PA_6, PA_7, PA_8, PB_0, PB_1, PB_6, PB_7, PB_8, PB_9};
 
-int gpioPins[] = {PA0, PA1, PA2, PA3, PA4, PA5, PA6, PA7, PA8, PA11, PA12, PA13, PA14, PA15,
+int gpioPins[] = {PA0, PA1, PA2, PA3, PA4, PA5, PA6, PA7, PA8, PA11, PA12, PA15,
                  PB0, PB1, PB3, PB4, PB5, PB6, PB7, PB8, PB9, PB10, PB11, PB12, PB13, PB14, PB15};
 
-int numGPIOPins = sizeof(gpioPins) / sizeof(gpioPins[0]);  // Number of pins
+//int numGPIOPins = sizeof(gpioPins) / sizeof(gpioPins[0]);  // Number of pins
+int numGPIOPins = 16;
 //~ int numPWMPins = sizeof(pwmPins) / sizeof(pwmPins[0]);  // Number of pins
 
 
@@ -24,19 +25,25 @@ void setup() {
 	  if (receivedMessage== 001) {
 		  digitalWrite(LED_PIN, HIGH); // Turn LED on
 		  Serial1.println(002);  // Send back handshake confirmation
-		  delay(250);
+		  delay(300);
 		  //digitalWrite(LED_PIN, LOW);  // Turn LED off
 	  }
-
+	// turn all pgpio pins to low output
+	for (int i = 0; i < numGPIOPins; i++) {
+		pinMode(gpioPins[i], OUTPUT);
+	}
+	for (int i = 0; i < numGPIOPins; i++) {
+		digitalWrite(gpioPins[i], LOW);  // Turn LED off
+	}
 }
 
 
-void testGPIO(int index) {
+void pinHIGH(int index) {
 	int pin = gpioPins[index];
 	pinMode(pin, OUTPUT);
 	digitalWrite(pin, HIGH);
 	Serial1.println(100+index);
-	delay(1000);
+	delay(200);
 	digitalWrite(pin,LOW);
 	Serial1.flush();
 }
@@ -63,13 +70,7 @@ void loop() {
 	{
 	case 1:
 	{
-		for (int i = 0; i < numGPIOPins; i++) {
-			pinMode(gpioPins[i], OUTPUT);
-		}
-		for (int i = 0; i < numGPIOPins; i++) {
-			digitalWrite(gpioPins[i], LOW);  // Turn LED off
-		}
-		testGPIO(pinNum);
+		pinHIGH(pinNum);
 		break;
 	}
 	case 2:
