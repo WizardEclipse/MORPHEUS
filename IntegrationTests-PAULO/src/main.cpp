@@ -54,6 +54,7 @@ void loop() {
   TEST1_UARTHandShake();
   delay(1000);            // wait before next test
   TEST2_GPIO4plex_notfinal();
+  //commsEcho(102);
 }
 
 /**
@@ -142,9 +143,10 @@ void commsEcho(int Code) {
   Serial1.println(Code);          //Send code through UART configured as Serial1
   while (!Serial1.available());   //Recieve code through UART
   int rec = Serial1.parseInt();   //Expect only integer codes
-  display_handler.print(rec % 100);
-  display_handler.print(" ");
+  display_handler.print(rec);
+  //display_handler.print("");
   display_handler.display();
+  Serial1.flush();
 }
 
 /**
