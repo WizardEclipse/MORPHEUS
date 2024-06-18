@@ -21,6 +21,8 @@ volatile int flashFlag;   // Flash Flag
 // Shows mapping of pins to input ports A0, A1, A2, A3
 int PortA0Pins[] = {PA0, PA1, PA2, PA3, PA4, PA5, PA6, PA7};
 int PortA1Pins[] = {PA8, PA11, PA12, PA15, PB0, PB1, PB3, PB4};
+int PortA2Pins[] = {};
+int PortA3Pins[] = {};
 
 /**
  * @brief main setup function.
@@ -34,10 +36,10 @@ void setup() {
   pinMode(PB13, OUTPUT);
   pinMode(PB14, OUTPUT);
   // Initaialize 4 ports for MUX input
-  pinMode(PA0, INPUT);
-  pinMode(PA1, INPUT);
-  pinMode(PA2, INPUT);
-  pinMode(PA3, INPUT);
+  pinMode(PA0, INPUT_PULLDOWN);
+  pinMode(PA1, INPUT_PULLDOWN);
+  pinMode(PA2, INPUT_PULLDOWN);
+  pinMode(PA3, INPUT_PULLDOWN);
   // Initialize Flash Response pins
   pinMode(PB10, INPUT_PULLUP);
   pinMode(PB11, INPUT_PULLUP);
@@ -57,6 +59,13 @@ void loop() {
   //commsEcho(102);
 }
 
+
+
+
+
+
+
+// FUNCTIONS
 /**
  * @brief Sets up mini display I2C
 */
@@ -184,8 +193,8 @@ void setMultiplex(int muxChannel) {
  * 4, 8:1 MUX are connected to 30 pins on TESTI, MUX output lines are connected to PAULO.
  *          MUX0 out -> PA0 on PAULO
  *          MUX1 out -> PA1 on PAULO
- *          MUX2 out -> PA0 on PAULO
- *          MUX3 out -> PA1 on PAULO
+ *          MUX2 out -> PA2 on PAULO
+ *          MUX3 out -> PA3 on PAULO
  *          
  * Channel selection on 4 MUXs are set to use the same A, B and C values, driven by PAULO lines PB12, PB13, PB14.
  *          MUX0 A, MUX1 A, MUX2 A, MUX3 A ->  PB12 on PAULO
@@ -194,15 +203,21 @@ void setMultiplex(int muxChannel) {
 
 */
 void TEST2_GPIO4plex_notfinal(void) {
+  display_handler.println("Intiating GPIO Test...");
+  delay(1000);
   display_handler.clearDisplay();
   display_handler.setCursor(0,0);
   
+  int PA0IN[8]; // t
   for (int i = 0; i < 8; i++) { // go through all 8 MUX channels
     
     setMultiplex(i);    // set A,B,C on MUXs
     
     commsEcho(100 + i); // TEST turns pin high when recieving 100 + x + i
-    display_handler.print(digitalRead(PA0)); // Expect 1
+
+    int vin = digitalRead(PA0); // Expect 1
+    PA0IN[i] = vin; // t
+    display_handler.print(vin);
     display_handler.print(" ");
     commsEcho(100 + 8 + i);
     display_handler.print(digitalRead(PA1)); // Expect 1
@@ -217,5 +232,14 @@ void TEST2_GPIO4plex_notfinal(void) {
     
     delay(500);
   }
-}
+  // test code
+  delay(1000);
+  display_handler.clearDisplay();
+  display_handler.setCursor(0,0);
 
+  display_handler.println("PORT A0 INPUTS:");
+  for (int i = 0; i < 8; i++) {
+    display_handler.print(PA0IN[i]);
+    display_handler.display();
+  }
+}
